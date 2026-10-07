@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дневник смен водителя | Driver Shift Log</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Header -->
+    <header class="navbar">
+      <div class="navbar-brand">
+        <div class="brand-icon">🚕</div>
+        <div class="brand-text">
+          <h1>Дневник смен</h1>
+          <span class="brand-badge">Driver Log</span>
+        </div>
+      </div>
+
+      <div class="navbar-actions">
+        <button id="btnOpenAddModal" class="btn btn-primary">
+          <span class="icon">+</span> Новая поездка
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+      <!-- Date Navigator -->
+      <section class="date-navigator-card">
+        <div class="nav-controls">
+          <button id="btnPrevDay" class="btn btn-icon" title="Предыдущий день">←</button>
+          
+          <div class="date-picker-wrap">
+            <input type="date" id="dateInput" class="date-input">
+            <span id="dateHumanLabel" class="date-human-label">Загрузка...</span>
+          </div>
+
+          <button id="btnNextDay" class="btn btn-icon" title="Следующий день">→</button>
+        </div>
+
+        <!-- Quick date chips -->
+        <div class="date-chips-wrap">
+          <span class="chips-label">Смены:</span>
+          <div id="dateChipsContainer" class="date-chips">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- KPI Summary Cards Grid -->
+      <section class="kpi-grid">
+        <div class="kpi-card highlight-green">
+          <div class="kpi-header">
+            <span class="kpi-title">«На руки»</span>
+            <span class="kpi-icon">💵</span>
+          </div>
+          <div class="kpi-value" id="kpiNetIncome">0 ₽</div>
+          <div class="kpi-subtitle">Чистый доход за день</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">Выручка</span>
+            <span class="kpi-icon">💰</span>
+          </div>
+          <div class="kpi-value" id="kpiRevenue">0 ₽</div>
+          <div class="kpi-subtitle">Сумма всех заказов</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">Комиссия</span>
+            <span class="kpi-icon">📉</span>
+          </div>
+          <div class="kpi-value" id="kpiCommission">0 ₽</div>
+          <div class="kpi-subtitle" id="kpiCommissionRate">Парк и сервис</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">Поездок</span>
+            <span class="kpi-icon">🚖</span>
+          </div>
+          <div class="kpi-value" id="kpiTripsCount">0</div>
+          <div class="kpi-subtitle">Завершено за смену</div>
+        </div>
+      </section>
+
+      <!-- Payment Breakdown Card -->
+      <section class="breakdown-card">
+        <div class="card-header">
+          <h2>Разбивка по способам оплаты</h2>
+          <span class="badge-tag">Наличные vs Карта</span>
+        </div>
+
+        <!-- Progress bar visual -->
+        <div class="progress-bar-container">
+          <div id="progressCard" class="progress-segment card-bg" style="width: 50%" title="Безналичные"></div>
+          <div id="progressCash" class="progress-segment cash-bg" style="width: 50%" title="Наличные"></div>
+        </div>
+
+        <div class="breakdown-details-grid">
+          <!-- Card Column -->
+          <div class="breakdown-col card-theme">
+            <div class="col-title">
+              <span class="dot card-dot"></span>
+              <h3>💳 Безналичные (карта)</h3>
+            </div>
+            <div class="stat-row">
+              <span class="label">Поездок:</span>
+              <span class="val" id="cardTripsCount">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="label">Выручка:</span>
+              <span class="val" id="cardRevenue">0 ₽</span>
+            </div>
+            <div class="stat-row">
+              <span class="label">Комиссия:</span>
+              <span class="val" id="cardCommission">0 ₽</span>
+            </div>
+            <div class="stat-row total-row">
+              <span class="label">«На руки»:</span>
+              <span class="val text-gold" id="cardNetIncome">0 ₽</span>
+            </div>
+          </div>
+
+          <!-- Cash Column -->
+          <div class="breakdown-col cash-theme">
+            <div class="col-title">
+              <span class="dot cash-dot"></span>
+              <h3>💵 Наличные (в кармане)</h3>
+            </div>
+            <div class="stat-row">
+              <span class="label">Поездок:</span>
+              <span class="val" id="cashTripsCount">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="label">Выручка:</span>
+              <span class="val" id="cashRevenue">0 ₽</span>
+            </div>
+            <div class="stat-row">
+              <span class="label">Комиссия:</span>
+              <span class="val" id="cashCommission">0 ₽</span>
+            </div>
+            <div class="stat-row total-row">
+              <span class="label">«На руки»:</span>
+              <span class="val text-gold" id="cashNetIncome">0 ₽</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Trips List Section -->
+      <section class="trips-section">
+        <div class="trips-section-header">
+          <div>
+            <h2>Список поездок за день</h2>
+            <p class="subtitle" id="tripsSubheader">Показано: 0 поездок</p>
+          </div>
+          <div class="section-actions">
+            <button id="btnDemoDuplicate" class="btn btn-secondary btn-sm" title="Отправить дубликат поездки t1 для демонстрации защиты">
+              🛡 Проверить защиту от дублей
+            </button>
+          </div>
+        </div>
+
+        <div id="tripsList" class="trips-list">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-icon">🛋</div>
+          <h3>Нет поездок за этот день</h3>
+          <p>В этот день смена не открывалась или поездки ещё не добавлены.</p>
+          <button id="btnEmptyAdd" class="btn btn-primary" style="margin-top: 1rem;">
+            + Добавить первую поездку
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal: Add Trip -->
+    <div id="addModal" class="modal-backdrop" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3>Добавить поездку</h3>
+          <button id="btnCloseModal" class="btn-close" aria-label="Закрыть">✕</button>
+        </div>
+
+        <form id="addTripForm" class="modal-form">
+          <div id="formErrorBox" class="alert alert-error" style="display: none;"></div>
+
+          <div class="form-group">
+            <label for="tripId">ID поездки <span class="optional">(необязательно, сгенерируется сам)</span></label>
+            <input type="text" id="tripId" class="form-input" placeholder="например, t11">
+            <span class="field-hint">Повторный ID или идентичная поездка будут распознаны как дубль.</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tripStart">Время начала (start) *</label>
+              <input type="datetime-local" id="tripStart" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label for="tripEnd">Время окончания (end) *</label>
+              <input type="datetime-local" id="tripEnd" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="quick-duration-bar">
+            <span>Быстрый выбор длительности:</span>
+            <button type="button" class="btn-chip" data-min="15">+15 мин</button>
+            <button type="button" class="btn-chip" data-min="25">+25 мин</button>
+            <button type="button" class="btn-chip" data-min="40">+40 мин</button>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tripAmount">Сумма (₽) * <span class="hint-inline">&gt; 0</span></label>
+              <input type="number" id="tripAmount" class="form-input" min="1" step="0.01" placeholder="2400" required>
+            </div>
+            <div class="form-group">
+              <label for="tripCommission">Комиссия (₽) * <span class="hint-inline">&ge; 0</span></label>
+              <input type="number" id="tripCommission" class="form-input" min="0" step="0.01" placeholder="360" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Способ оплаты *</label>
+            <div class="payment-radio-group">
+              <label class="radio-card">
+                <input type="radio" name="tripPayment" value="card" checked>
+                <span class="radio-content">
+                  <span class="radio-icon">💳</span>
+                  <span class="radio-label">Карта (Безнал)</span>
+                </span>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="tripPayment" value="cash">
+                <span class="radio-content">
+                  <span class="radio-icon">💵</span>
+                  <span class="radio-label">Наличные</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" id="btnCancelModal" class="btn btn-secondary">Отмена</button>
+            <button type="submit" id="btnSubmitTrip" class="btn btn-primary">Сохранить поездку</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast" style="display: none;"></div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
