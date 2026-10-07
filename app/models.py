@@ -12,7 +12,7 @@ class PaymentType(str, Enum):
 class TripBase(BaseModel):
     start: datetime = Field(..., description="Время начала поездки (ISO 8601)")
     end: datetime = Field(..., description="Время окончания поездки (ISO 8601)")
-    amount: float = Field(..., gt=0, description="Стоимость поездки, должна быть строго больше 0")
+    amount: float = Field(..., gt=0, description="Стоимость поездки в тенге (₸), должна быть строго больше 0")
     payment: PaymentType = Field(..., description="Способ оплаты: 'cash' или 'card'")
     commission: float = Field(..., ge=0, description="Комиссия сервиса/парка, должна быть >= 0")
 

@@ -18,8 +18,8 @@ if hasattr(sys.stdout, "reconfigure"):
 DEFAULT_SERVER_URL = "http://127.0.0.1:8000"
 
 
-def format_rubles(val: float) -> str:
-    return f"{val:,.2f} руб.".replace(",", " ")
+def format_currency(val: float) -> str:
+    return f"{val:,.2f} ₸".replace(",", " ")
 
 
 def print_summary(summary: dict):
@@ -27,19 +27,19 @@ def print_summary(summary: dict):
     print(f"[ СВОДКА СМЕНЫ ЗА ДАТУ: {summary['date']} ]")
     print("=" * 60)
     print(f"  Всего поездок:         {summary['trips_count']}")
-    print(f"  Общая выручка:         {format_rubles(summary['revenue'])}")
-    print(f"  Общая комиссия:        {format_rubles(summary['commission'])}")
-    print(f"  --> НА РУКИ (чистыми): {format_rubles(summary['net_income'])}")
+    print(f"  Общая выручка:         {format_currency(summary['revenue'])}")
+    print(f"  Общая комиссия:        {format_currency(summary['commission'])}")
+    print(f"  --> НА РУКИ (чистыми): {format_currency(summary['net_income'])}")
     print("-" * 60)
     print("  РАЗБИВКА ПО ОПЛАТЕ:")
     card = summary.get("card", {})
     cash = summary.get("cash", {})
     print(f"  [Карта]:     {card.get('trips_count', 0)} поездок | "
-          f"Выручка: {format_rubles(card.get('revenue', 0))} | "
-          f"На руки: {format_rubles(card.get('net_income', 0))}")
+          f"Выручка: {format_currency(card.get('revenue', 0))} | "
+          f"На руки: {format_currency(card.get('net_income', 0))}")
     print(f"  [Наличные]:  {cash.get('trips_count', 0)} поездок | "
-          f"Выручка: {format_rubles(cash.get('revenue', 0))} | "
-          f"На руки: {format_rubles(cash.get('net_income', 0))}")
+          f"Выручка: {format_currency(cash.get('revenue', 0))} | "
+          f"На руки: {format_currency(cash.get('net_income', 0))}")
     print("=" * 60)
 
 
@@ -55,8 +55,8 @@ def print_trips(trips: list):
         time_str = f"{start_t} - {end_t}"
         payment_str = "Карта" if t['payment'] == 'card' else "Наличные"
         net = round(t['amount'] - t['commission'], 2)
-        print(f"{t['id']:<6} | {time_str:<20} | {payment_str:<10} | {format_rubles(t['amount']):<14} | "
-              f"{format_rubles(t['commission']):<12} | {format_rubles(net):<12}")
+        print(f"{t['id']:<6} | {time_str:<20} | {payment_str:<10} | {format_currency(t['amount']):<14} | "
+              f"{format_currency(t['commission']):<12} | {format_currency(net):<12}")
     print("=" * 80)
 
 
@@ -127,8 +127,8 @@ def run_interactive(server_url: str):
             tid = input("ID (оставьте пустым для автогенерации): ").strip() or None
             s = input(f"Время начала [{current_date}T10:00:00+05:00]: ").strip() or f"{current_date}T10:00:00+05:00"
             e = input(f"Время окончания [{current_date}T10:30:00+05:00]: ").strip() or f"{current_date}T10:30:00+05:00"
-            amt = float(input("Сумма поездки (руб.): ").strip() or "2000")
-            comm = float(input(f"Комиссия (руб.) [по умолчанию {amt * 0.15:.0f}]: ").strip() or str(amt * 0.15))
+            amt = float(input("Сумма поездки (тенге): ").strip() or "2000")
+            comm = float(input(f"Комиссия (тенге) [по умолчанию {amt * 0.15:.0f}]: ").strip() or str(amt * 0.15))
             pay = input("Способ оплаты (card/cash) [card]: ").strip() or "card"
             cmd_add_trip(server_url, s, e, amt, pay, comm, tid)
         elif choice == "5":

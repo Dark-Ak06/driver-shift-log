@@ -54,8 +54,8 @@ const toastEl = document.getElementById('toast');
 
 // --- Helpers ---
 function formatCurrency(num) {
-  if (num === undefined || num === null) return '0 ₽';
-  return Math.round(num).toLocaleString('ru-RU') + ' ₽';
+  if (num === undefined || num === null) return '0 ₸';
+  return Math.round(num).toLocaleString('ru-RU') + ' ₸';
 }
 
 function formatDateHuman(dateStr) {
@@ -356,7 +356,7 @@ addTripForm.addEventListener('submit', async (e) => {
 
   // Client-side validations
   if (isNaN(amount) || amount <= 0) {
-    showFormError('Сумма поездки должна быть больше 0 ₽.');
+    showFormError('Сумма поездки должна быть больше 0 ₸.');
     return;
   }
   if (new Date(endVal) <= new Date(startVal)) {
@@ -364,7 +364,7 @@ addTripForm.addEventListener('submit', async (e) => {
     return;
   }
   if (isNaN(commission) || commission < 0) {
-    showFormError('Комиссия должна быть не меньше 0 ₽.');
+    showFormError('Комиссия должна быть не меньше 0 ₸.');
     return;
   }
   if (commission > amount) {
